@@ -19,7 +19,7 @@ INSTALLATION
 4) Restart PyMOL
 
 Using MacPyMOL  
-1) Rename the "MacPyMOL.app" to "PyMOLX11Hybrid.app" in Applications folder. 
+1) Rename the "MacPyMOL.app" to "PyMOLX11Hybrid.app" in Applications folder.
 2) Install XQuartz found at http://xquartz.macosforge.org/landing/
 3) Follow the installatin procedure of plugin mentioned above. 
 
