@@ -1,7 +1,7 @@
 """
-----------
-PyMine 1.0
-----------
+------------
+PyMine 1.0.0
+------------
 PyMine lets you integrate and visualize biological data used for drug discovery using PyMOL. 
 
 ------------
@@ -9,7 +9,7 @@ REQUIREMENTS
 ------------
 1) Ubuntu 11.04 or above OR Mac OS X 10.7 or above
 2) Pymol 1.7 or above
-3) PyMine
+3) PyMine 1.0.0
 
 ------------
 INSTALLATION
@@ -41,7 +41,7 @@ RESULTS
 -------
 History
 -------
-- v1.0: Initial public release
+- v1.0.0: Initial public release
 
 -------------
 Licence (MIT)
