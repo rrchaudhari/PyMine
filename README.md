@@ -6,9 +6,9 @@ PyMine lets you integrate and visualize biological data used for drug discovery 
 ------------
 REQUIREMENTS
 ------------
-1) Ubuntu 11.04 or above OR Mac OS X 10.7 or above
+1) Ubuntu 10.04 or above OR Mac OS X 10.7 or above
 2) PyMOL 1.7 or above
-3) PyMine
+3) PyMine 1.0
 
 ------------
 INSTALLATION
@@ -35,4 +35,4 @@ RESULTS
 -------
 1) In PyMOL graphics viewer SAPs and Binding Sites data will be available for viewing.
 2) In PyMine GUI data will be available and accessed using relevant tabs/buttons.
-3) Output files will be saved in a desktop folder named "PyMine_outdir_xxxx". 
+3) Output files will be saved in a desktop folder named "PyMine_Outdir_xxxx". 
