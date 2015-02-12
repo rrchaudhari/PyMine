@@ -6,7 +6,7 @@ PyMine lets you integrate and visualize biological data used for drug discovery 
 ------------
 REQUIREMENTS
 ------------
-1) Ubuntu 10.04 or above OR Mac OS X 10.7 or above
+1) Ubuntu 11.04 or above OR Mac OS X 10.7 or above
 2) PyMOL 1.7 or above
 3) PyMine 1.0.0
 
