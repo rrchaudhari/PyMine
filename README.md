@@ -1,7 +1,7 @@
 ----------
 
 [![Join the chat at https://gitter.im/rrchaudhari/PyMine](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/rrchaudhari/PyMine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-PyMine 1.0.0
+PyMine 1.0.1
 ----------
 PyMine lets you integrate and visualize biological data used for drug discovery purpose. 
 
