@@ -510,20 +510,20 @@ class PyMine(Tkinter.Tk):
                     disease=line.split()[6:]
                     self.saps.append([origres, num, changedres, disease])
                     #print gene_name, mutation, origres, num, changedres
-            else:
-                print "Blank line in humsavar"
+
     def show_saps(self):
         print "10 Showing SAPS...."
         sap_residues=list()
         sap_res_str=''
-        
         for i in self.saps:
-            sap_residues.append(i[1])
-        sap_res_str="resi "+','.join(map(str, sap_residues))
-        print sap_res_str
-        pymol.cmd.select("SAPs", sap_res_str)
-        pymol.cmd.show("spheres", sap_res_str)
-        pymol.cmd.deselect()
+            if i[1] not in sap_residues:
+                sap_residues.append(i[1])
+        for i in sap_residues:
+            sap_res_str="resi " + str(i)
+            print sap_res_str
+            pymol.cmd.select("SAPs", sap_res_str)
+            pymol.cmd.show("spheres", sap_res_str)
+            pymol.cmd.deselect()
     def get_bs(self):
         print "11 Aquiring binding site information...."
         lig_bs=list()
