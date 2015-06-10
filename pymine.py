@@ -159,8 +159,9 @@ class PyMine(Tkinter.Tk):
         self.button3.grid(row=2, column=3, columnspan=2, sticky=Tkinter.W)
 
         ## OUTPUT 
-        self.rframe = Tkinter.LabelFrame(master=self.frame1)
+        self.rframe=Tkinter.LabelFrame(master=self.frame1)
         self.rframe.grid(row=4, column=0, columnspan=10)
+
         self.button5=Tkinter.Button(self.rframe, text="Protein", command=self.lift_prot_info)
         self.button5.grid(row=0, column=0)
         self.button6=Tkinter.Button(self.rframe, text="Ligands", command=self.lift_lig_info)
@@ -180,6 +181,9 @@ class PyMine(Tkinter.Tk):
 
         self.text1=Tkinter.Text(master=self.rframe, wrap=Tkinter.WORD)
         self.text1.grid(row=5, column=0, columnspan=10, stick='ns')
+        scrollbar1=Tkinter.Scrollbar(self.rframe, command=self.text1.yview)
+        scrollbar1.grid(row=5, column=11, sticky='nswe')
+        self.text1.configure(yscrollcommand=scrollbar1.set)
         self.text1.lower()
 
         self.text2=Tkinter.Text(master=self.rframe, wrap=Tkinter.WORD)
@@ -188,10 +192,12 @@ class PyMine(Tkinter.Tk):
 
         self.text3=Tkinter.Text(master=self.rframe, wrap=Tkinter.WORD)
         self.text3.grid(row=5, column=0, columnspan=10, stick='ns')
+        self.text3.lower()
 
         self.text4=Tkinter.Text(master=self.rframe, wrap=Tkinter.WORD)
         self.text4.grid(row=5, column=0, columnspan=10, stick='ns')
         self.text4.lower()
+
 
         self.text5=Tkinter.Text(master=self.rframe, wrap=Tkinter.WORD)
         self.text5.grid(row=5, column=0, columnspan=10, stick='ns')
@@ -203,6 +209,9 @@ class PyMine(Tkinter.Tk):
 
     def lift_prot_info(self):
         self.text1.lift()
+        scrollbar1=Tkinter.Scrollbar(self.rframe, command=self.text1.yview)
+        scrollbar1.grid(row=5, column=11, sticky='nswe')
+        self.text1.configure(yscrollcommand=scrollbar1.set)
         self.text2.lower()
         self.text3.lower()
         self.text4.lower()
@@ -210,13 +219,19 @@ class PyMine(Tkinter.Tk):
         self.text6.lower()
     def lift_lig_info(self):
         self.text1.lower()
-        self.text3.lower()
         self.text2.lift()
+        scrollbar2=Tkinter.Scrollbar(self.rframe, command=self.text2.yview)
+        scrollbar2.grid(row=5, column=11, sticky='nswe')
+        self.text2.configure(yscrollcommand=scrollbar2.set)
+        self.text3.lower()
         self.text4.lower()
         self.text5.lower()
         self.text6.lower()
     def lift_pdb_file(self):
         self.text3.lift()
+        scrollbar3=Tkinter.Scrollbar(self.rframe, command=self.text3.yview)
+        scrollbar3.grid(row=5, column=11, sticky='nswe')
+        self.text3.configure(yscrollcommand=scrollbar3.set)
         self.text1.lower()
         self.text2.lower()
         self.text4.lower()
@@ -224,6 +239,9 @@ class PyMine(Tkinter.Tk):
         self.text6.lower()
     def lift_uniprot_file(self):
         self.text4.lift()
+        scrollbar4=Tkinter.Scrollbar(self.rframe, command=self.text4.yview)
+        scrollbar4.grid(row=5, column=11, sticky='nswe')
+        self.text4.configure(yscrollcommand=scrollbar4.set)
         self.text1.lower()
         self.text2.lower()
         self.text3.lower()
@@ -231,6 +249,9 @@ class PyMine(Tkinter.Tk):
         self.text6.lower()
     def lift_kegg_info(self):
         self.text5.lift()
+        scrollbar5=Tkinter.Scrollbar(self.rframe, command=self.text5.yview)
+        scrollbar5.grid(row=5, column=11, sticky='nswe')
+        self.text5.configure(yscrollcommand=scrollbar5.set)
         self.text1.lower()
         self.text2.lower()
         self.text3.lower()
@@ -238,6 +259,9 @@ class PyMine(Tkinter.Tk):
         self.text6.lower()
     def lift_ligss_info(self):
         self.text6.lift()
+        scrollbar6=Tkinter.Scrollbar(self.rframe, command=self.text6.yview)
+        scrollbar6.grid(row=5, column=11, sticky='nswe')
+        self.text6.configure(yscrollcommand=scrollbar6.set)
         self.text1.lower()
         self.text2.lower()
         self.text3.lower()
@@ -753,6 +777,7 @@ class PyMine(Tkinter.Tk):
             self.text5.insert(Tkinter.INSERT, "Kegg data not found.\n\n")
         print os.getcwd()
     def get_results(self):
+        self.text1.lift()
         self.text1.config(state=Tkinter.NORMAL)
         self.text1.delete(1.0, Tkinter.END)
         self.text2.config(state=Tkinter.NORMAL)
@@ -894,7 +919,7 @@ class PyMine(Tkinter.Tk):
         self.outdir=None
         pdbfile=None
         pymol.cmd.delete("all")
-        self.text4.upper()
+        self.text1.lift()
 def main():
     app = PyMine(None)
     app.title('PyMine Data Integration')
