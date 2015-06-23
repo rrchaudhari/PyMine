@@ -72,10 +72,12 @@ import os
 import sys
 import fileinput
 import Tkinter
+import tkMessageBox
 import urllib2
 import pymol
 from Tkinter import PhotoImage as PI
 import xml.etree.ElementTree as ET
+import webbrowser
 
 #initialize pymol plugin
 def __init__(self):
@@ -83,7 +85,6 @@ def __init__(self):
                         'Gather information',
                         label = 'PyMine',
                         command = main)
-
 class PyMine(Tkinter.Tk): 
     def __init__(self,parent):
         Tkinter.Tk.__init__(self,parent)
@@ -117,19 +118,18 @@ class PyMine(Tkinter.Tk):
         self.target_chemblID=''
         self.approved_drugs=list()
         self.ligand_images=list()
-        self.kegg_info=''
-    
+        self.kegg_info='' 
     def createGUI(self):
         ## Create Frame
         self.frame1=Tkinter.Frame(self)
-        self.frame1.grid()
+        self.frame1.grid(sticky='nswe')
 
         ## INPUT 
         self.label1=Tkinter.Label(self.frame1, text="Enter PDB ID and Chain ID")   #LABEL
         self.label1.grid(row=1, column=0, sticky=Tkinter.W)
         
         self.entryVariable1=Tkinter.StringVar(master=self.frame1)  #INPUT Variable
-        self.entryVariable1.set('4MRC')
+        self.entryVariable1.set('1RTK')
         
         self.entry1=Tkinter.Entry(self.frame1, textvariable=self.entryVariable1, width=4) #INPUT Box
         self.entry1.grid(row=1, column=1, sticky=Tkinter.W)
@@ -157,10 +157,13 @@ class PyMine(Tkinter.Tk):
         
         self.button3=Tkinter.Button(self.frame1, text="Find Similar Ligands", command=self.get_similar_ligands) #Button2
         self.button3.grid(row=2, column=3, columnspan=2, sticky=Tkinter.W)
+        
+        self.button11=Tkinter.Button(self.frame1, text="?", command=self.smiles_help)
+        self.button11.grid(row=2, column=5, sticky=Tkinter.W)
 
         ## OUTPUT 
-        self.rframe=Tkinter.LabelFrame(master=self.frame1)
-        self.rframe.grid(row=4, column=0, columnspan=10)
+        self.rframe=Tkinter.LabelFrame(master=self.frame1, text="Data Panel")
+        self.rframe.grid(row=4, columnspan=6, sticky='nswe')
 
         self.button5=Tkinter.Button(self.rframe, text="Protein", command=self.lift_prot_info)
         self.button5.grid(row=0, column=0)
@@ -179,12 +182,16 @@ class PyMine(Tkinter.Tk):
         self.button10=Tkinter.Button(self.rframe, text="Similar Ligands", command=self.lift_ligss_info)
         self.button10.grid(row=0, column=5)      
 
+
         self.text1=Tkinter.Text(master=self.rframe, wrap=Tkinter.WORD)
         self.text1.grid(row=5, column=0, columnspan=10, stick='ns')
+        
         scrollbar1=Tkinter.Scrollbar(self.rframe, command=self.text1.yview)
         scrollbar1.grid(row=5, column=11, sticky='nswe')
         self.text1.configure(yscrollcommand=scrollbar1.set)
+        
         self.text1.lower()
+
 
         self.text2=Tkinter.Text(master=self.rframe, wrap=Tkinter.WORD)
         self.text2.grid(row=5, column=0, columnspan=10, stick='ns')
@@ -198,7 +205,6 @@ class PyMine(Tkinter.Tk):
         self.text4.grid(row=5, column=0, columnspan=10, stick='ns')
         self.text4.lower()
 
-
         self.text5=Tkinter.Text(master=self.rframe, wrap=Tkinter.WORD)
         self.text5.grid(row=5, column=0, columnspan=10, stick='ns')
         self.text5.lower()
@@ -206,7 +212,6 @@ class PyMine(Tkinter.Tk):
         self.text6=Tkinter.Text(master=self.rframe, wrap=Tkinter.WORD)
         self.text6.grid(row=5, column=0, columnspan=10, stick='ns')
         self.text6.lower()
-
     def lift_prot_info(self):
         self.text1.lift()
         scrollbar1=Tkinter.Scrollbar(self.rframe, command=self.text1.yview)
@@ -267,7 +272,33 @@ class PyMine(Tkinter.Tk):
         self.text3.lower()
         self.text4.lower()
         self.text5.lower()
-
+    def smiles_help(self):
+        tkMessageBox.showinfo(title = 'Smiles', message = "To find similar ligands, paste your smile string in the entry box and hit Find Similar Ligands button. \n On Mac use Command+C to copy from the Data Panel and use Control+V to paste in the entry box")
+    def showLink(self, event, arg):
+        webbrowser.open_new(arg)
+    def show_pathway(self, path):
+        toplevel = Tkinter.Toplevel()
+        #toplevel.grid(sticky='nswe')
+        toplevel.columnconfigure(0, weight=1)
+        toplevel.rowconfigure(0, weight=1)
+        Tframe=Tkinter.Frame(toplevel)
+        Tframe.grid(sticky='nswe')
+        Tframe.columnconfigure(0, weight=1)
+        Tframe.rowconfigure(0, weight=1)
+        PathwayImage=Tkinter.PhotoImage(file=path)
+        PhotoImage=Tkinter.Text(Tframe)
+        PhotoImage.image_create(Tkinter.END, image=PathwayImage)
+        PhotoImage.img=PathwayImage
+        PhotoImage.grid(row = 0, column=0, sticky='nswe')
+        scrollbar1=Tkinter.Scrollbar(Tframe, command=PhotoImage.yview)
+        scrollbar1.grid(row=0, column=1, sticky='nswe')
+        scrollbar2=Tkinter.Scrollbar(Tframe, orient=Tkinter.HORIZONTAL, command=PhotoImage.xview)
+        scrollbar2.grid(row=1, column=0, sticky='nswe')
+        PhotoImage.columnconfigure(0, weight=1)
+        PhotoImage.rowconfigure(0, weight=1)
+        PhotoImage.configure(yscrollcommand=scrollbar1.set)
+        PhotoImage.configure(xscrollcommand=scrollbar2.set)
+        PhotoImage.lift()
     def get_similar_ligands(self):
         self.ligssdir=os.path.join(self.outdir, "Similar_Ligands")
         if os.path.exists(self.ligssdir):
@@ -275,12 +306,12 @@ class PyMine(Tkinter.Tk):
         else:
             os.mkdir(self.ligssdir)
             os.chdir(self.ligssdir)
-        print "Aquiring similar ligands...."
+        #print "Aquiring similar ligands...."
         self.smiles=self.entryVariable3.get()
-        print self.smiles        
+        #print self.smiles        
         self.lift_ligss_info()
         url="https://www.ebi.ac.uk/chemblws/compounds/similarity/"+self.smiles+"/70"
-        print url
+        #print url
         try:
             self.text6.config(state=Tkinter.NORMAL)
             self.text6.delete(1.0, Tkinter.END)
@@ -305,7 +336,8 @@ class PyMine(Tkinter.Tk):
             else:
                 print "Something happened in similar ligands! Error code", err.code
     def get_smiles(self, chembl_id):
-        print "Aquiring smiles...."
+        print "Aquiring smiles....\n THIS COULD TAKE LONG TIME DEPENDING ON NUMBER OF MOLECULES THAT MATCHES CRITERION!!"
+        #tkMessageBox.showinfo(title="Aquiring smiles...", message="THIS COULD TAKE LONG TIME DEPENDING ON NUMBER OF MOLECULES THAT MATCHES CRITERION!!")
         ids=chembl_id
         smiles=list()
         for i in ids:
@@ -323,7 +355,7 @@ class PyMine(Tkinter.Tk):
                     print "Something else happened in smiles! Error code", err.code
         return smiles
     def get_info(self):
-        print "1 Aquiring uniprot id from pdb id...."
+        #print "1 Aquiring uniprot id from pdb id...."
         self.pdb_id=self.entryVariable1.get().upper()
         self.pdb_chain_id=self.entryVariable2.get().upper()
         cwd = os.path.expanduser("~/Desktop/")
@@ -331,25 +363,15 @@ class PyMine(Tkinter.Tk):
         if not os.path.exists(self.outdir):
             os.mkdir(self.outdir)
             os.chdir(self.outdir)
-        url = 'http://www.bioinf.org.uk/cgi-bin/pdbsws/query.pl?plain=1&qtype=pdb&id='+str(self.pdb_id)
-        try:
-            response = urllib2.urlopen(url)
-            for line in response:
-                if line.startswith("AC"):
-                    self.uniprot.append(line.split()[1])
-        except urllib2.HTTPError, err:
-            if err.code == 404:
-                print "Page not found for uniprot id!"
-            elif err.code == 403:
-                print "Access denied for uniprot id!"
-            else:
-                print "Something else happened in uniprot id! Error code", err.code
-        if not self.uniprot:
-            print "uniprot id not found"
+        
+        for line in urllib2.urlopen('http://www.uniprot.org/docs/pdbtosp.txt'):
+            if len(line.split())>1:
+                if self.pdb_id == str(line.split()[0]):
+                    self.uniprot.append(str(line.split()[5])[1:-1])
     def show_pdb(self):
-        print "2 Importing 3d structure...."
+        #print "2 Importing 3d structure...."
         pymol.cmd.cd(self.outdir)
-        print pymol.cmd.pwd()
+        #print pymol.cmd.pwd()
         current_pdb=self.pdb_id
         #pymol.finish_launching()
         pymol.cmd.fetch(current_pdb) #pymol.cmd.load("/Users/rrc/Desktop/pymol_plugin/2RH1.pdb",current_pdb)
@@ -360,7 +382,7 @@ class PyMine(Tkinter.Tk):
         pymol.cmd.show('cartoon')
         pymol.cmd.select('ligand', 'organic')
     def get_pdb_uniprot_file(self):
-        print "3 Aquiring pdb and uniprot file...."
+        #print "3 Aquiring pdb and uniprot file...."
         filename=str(self.pdb_id.lower())+".pdb"
         pdbfile=open(filename, "r")
         for line in pdbfile:
@@ -374,7 +396,7 @@ class PyMine(Tkinter.Tk):
         else:
             print "Error in uniprot id"
     def get_ligands(self):
-        print "4 Aquiring pdb ligands...."
+        #print "4 Aquiring pdb ligands...."
         try:
             url="http://www.rcsb.org/pdb/rest/ligandInfo?structureId="+self.pdb_id
             response_xml = urllib2.urlopen(url).read()
@@ -395,19 +417,19 @@ class PyMine(Tkinter.Tk):
             else:
                 print "Something else happened in pdb ligands! Error code", err.code
     def get_ligand_images(self):
-        print "5 Aquiring pdb ligand images...."
+        #print "5 Aquiring pdb ligand images...."
         self.ligdir=os.path.join(self.outdir, "Ligands")
         if not os.path.exists(self.ligdir):
             os.mkdir(self.ligdir)
             os.chdir(self.ligdir)
-
+            
         if self.ligands:    
             for i in self.ligands:
                 chid=i[0]
-                print "Working on "+ str(chid)
+                #print "Working on "+ str(chid)
                 try:
                     url="http://www.ebi.ac.uk/chemblws/compounds/smiles/"+i[2] 
-                    print url
+                    #print url
                     response_xml_chemblids=urllib2.urlopen(url).read()
                     root=ET.fromstring(response_xml_chemblids)
                     if len(root)>0:
@@ -415,17 +437,17 @@ class PyMine(Tkinter.Tk):
                         self.ligand_chemblid.append([chid, lig_chemblID])
                 except urllib2.HTTPError, err:
                     if err.code == 404:
-                        print "Page not found!"
+                        print "Page not found for ligand images!"
                     elif err.code == 403:
-                        print "Access denied!"
+                        print "Access denied for ligand images!"
                     else:
-                        print "Something happened! Error code", err.code
+                        print "Ignored smiles retrieval for ions!"
         else:
             print "Ligands not present"
         if self.ligand_chemblid:
             for i in self.ligand_chemblid:
                 url="http://www.ebi.ac.uk/chemblws/compounds/"+i[1]+"/image" 
-                print url
+                #print url
                 imgRequest = urllib2.Request(url)
                 imgData=urllib2.urlopen(imgRequest).read()
                 self.ligand_images.append(imgData) 
@@ -435,7 +457,7 @@ class PyMine(Tkinter.Tk):
         else:
             print "Ligand chembl id not found"
     def get_target_chembl_id(self):
-        print "6 Aquiring target chembl id...."
+        #print "6 Aquiring target chembl id...."
         if self.uniprot:
             url="http://www.ebi.ac.uk/chemblws/targets/uniprot/"+str(self.uniprot[0])
             try:
@@ -450,16 +472,16 @@ class PyMine(Tkinter.Tk):
                         self.target_chemblID=i.text
             except urllib2.HTTPError, err:
                 if err.code == 404:
-                    print "Page not found!"
+                    print "Page not found for target chembl id!"
                 elif err.code == 403:
-                    print "Access denied!"
+                    print "Access denied for target chembl id!"
                 else:
                     print "Something happened in target chembl id! Error code", err.code
         else:
             print "Error in uniprot id!"
             self.text2.insert(Tkinter.END, "Could not retrieve assay information because uniprot id missing\n\n")
     def get_approved_drugs(self):
-        print "7 Aquiring approved drugs...."
+        #print "7 Aquiring approved drugs...."
         try:
             url="http://www.ebi.ac.uk/chemblws/targets/"+self.target_chemblID+"/approvedDrug"
             response_approved_xml=urllib2.urlopen(url).read()
@@ -474,13 +496,13 @@ class PyMine(Tkinter.Tk):
                 self.approved_drugs.append(molecule)
         except urllib2.HTTPError, err:
             if err.code == 404:
-                print "Page not found!"
+                print "Page not found for approved drugs!"
             elif err.code == 403:
-                print "Access denied!"
+                print "Access denied for approved drugs!"
             else:
                 print "Something happened in aquiring approved_drugs! Error code", err.code
     def show_lig_info(self):
-        print "8 Showing approved drug information...."
+        #print "8 Showing approved drug information...."
         os.chdir(self.ligdir)
         self.agonist=list()
         self.antagonist=list()
@@ -522,7 +544,7 @@ class PyMine(Tkinter.Tk):
                     fh.write(str(j[0][1]+"\n"))
             fh.close()    
     def get_saps(self):
-        print "9 Aquiring saps...."
+        #print "9 Aquiring saps...."
         for line in urllib2.urlopen('http://www.uniprot.org/docs/humsavar.txt'):
             if len(line.split())>1:
                 if str(self.uniprot[0]) == str(line.split()[1]):
@@ -534,9 +556,8 @@ class PyMine(Tkinter.Tk):
                     disease=line.split()[6:]
                     self.saps.append([origres, num, changedres, disease])
                     #print gene_name, mutation, origres, num, changedres
-
     def show_saps(self):
-        print "10 Showing SAPS...."
+        #print "10 Showing SAPS...."
         sap_residues=list()
         sap_res_str=''
         for i in self.saps:
@@ -544,12 +565,12 @@ class PyMine(Tkinter.Tk):
                 sap_residues.append(i[1])
         for i in sap_residues:
             sap_res_str="resi " + str(i)
-            print sap_res_str
+            #print sap_res_str
             pymol.cmd.select("SAPs", sap_res_str)
             pymol.cmd.show("spheres", sap_res_str)
             pymol.cmd.deselect()
     def get_bs(self):
-        print "11 Aquiring binding site information...."
+        #print "11 Aquiring binding site information...."
         lig_bs=list()
         ppi_bs=list()
         dna_bs=list()
@@ -573,15 +594,15 @@ class PyMine(Tkinter.Tk):
                     pep_bs.append([spline[1], spline[0], spline[3], spline[11], spline[12]])
         except urllib2.HTTPError, err:
             if err.code == 404:
-                print "Page not found!"
+                print "Page not found for binding sites!"
             elif err.code == 403:
-                print "Access denied!"
+                print "Access denied for binding sites!"
             else:
                 print "Something else happened in getting binding site information! Error code", err.code
                 
         self.binding_sites=[lig_bs, ppi_bs, dna_bs, rna_bs, ion_bs, pep_bs]
     def show_bs(self):
-        print "12 Showing binding sites...."
+        #print "12 Showing binding sites...."
         counter=0
         for i in self.binding_sites[0]:
             counter+=1
@@ -631,29 +652,29 @@ class PyMine(Tkinter.Tk):
             pymol.cmd.deselect()
         pymol.cmd.group("PEP_Binding_Sites", "pep_bs*")
     def get_assay_info(self):
-        print "13 Aquiring assay information...."
+        #print "13 Aquiring assay information...."
         os.chdir(self.ligdir)
         url="http://www.ebi.ac.uk/chemblws/targets/"+self.target_chemblID+"/bioactivities"  
         try:
             response_xml_chemblids=urllib2.urlopen(url).read()
             root=ET.fromstring(response_xml_chemblids)
             for i in root:
-                if i[6].text=="EC50" and i[13].text=="=" and i[12].text!="Unspecified" and float(i[12].text)<=100 and i[9].text=="nM":
+                if i[6].text=="EC50" and i[13].text=="=" and i[12].text!="Unspecified" and float(i[12].text)<=0.1 and i[9].text=="nM":
                     self.ec50_comps.append(i[4].text)
-                elif i[6].text=="IC50" and i[13].text=="=" and i[12].text!="Unspecified" and float(i[12].text)<=100 and i[9].text=="nM":
+                elif i[6].text=="IC50" and i[13].text=="=" and i[12].text!="Unspecified" and float(i[12].text)<=10 and i[9].text=="nM":
                     self.ic50_comps.append(i[4].text)
-                elif i[6].text=="Ki" and i[13].text=="=" and i[12].text!="Unspecified" and float(i[12].text)<=100 and i[9].text=="nM":
+                elif i[6].text=="Ki" and i[13].text=="=" and i[12].text!="Unspecified" and float(i[12].text)<=10 and i[9].text=="nM":
                     self.ki_comps.append(i[4].text)
         except urllib2.HTTPError, err:
             if err.code == 404:
-                print "Page not found!"
+                print "Page not found for assay data!"
             elif err.code == 403:
-                print "Access denied!"
+                print "Access denied for assay data!"
             else:
                 print "Something else happened in get_assay_info! Error code", err.code
         if self.ec50_comps:
-            print self.ec50_comps
-            print "EC50 data available"
+            #print self.ec50_comps
+            #print "EC50 data available"
             ec50_fh=open("EC50.txt", "w")
             for i in self.ec50_comps:
                 ec50_fh.write(str(i)+"\n")
@@ -666,7 +687,7 @@ class PyMine(Tkinter.Tk):
         else:
             print "EC50 data not available"
         if self.ic50_comps:
-            print "IC50 data available"
+            #print "IC50 data available"
             ic50_fh=open("IC50.txt", "w")
             for i in self.ic50_comps:
                 ic50_fh.write(str(i)+"\n")
@@ -679,7 +700,7 @@ class PyMine(Tkinter.Tk):
         else:
             print "IC50 data not available"
         if self.ki_comps:
-            print "Ki data available"
+            #print "Ki data available"
             ki_fh=open("KI.txt", "w")
             for i in self.ki_comps:
                 ki_fh.write(str(i)+"\n")
@@ -693,17 +714,19 @@ class PyMine(Tkinter.Tk):
         else:
             print "Ki data not available"
     def get_kegg_info(self):
-        print "15 Aquiring pathway information...."
-        print os.getcwd()
+        #print "15 Aquiring pathway information...."
+        #print os.getcwd()
         url = 'http://rest.genome.jp/link/genes/uniprot:'+self.uniprot[0]+'/original'
-        print "Aquiring genes...."
+        #print "Aquiring genes...."
         self.kegg_genes=list()
         try:
             response = urllib2.urlopen(url)
             for line in response:
                 self.kegg_genes.append(line.split()[1])
+            """
             for i in self.kegg_genes:
                 self.text5.insert(Tkinter.INSERT, str(i)+ "\n\n")
+            """
         except urllib2.HTTPError, err:
             if err.code == 404:
                 print "Page not found for genes!"
@@ -716,7 +739,7 @@ class PyMine(Tkinter.Tk):
         if self.kegg_genes:
             for i in self.kegg_genes:
                 url = 'http://rest.genome.jp/link/path/'+i+'/original'
-                print "Aquiring kegg pathaway id...."
+                #print "Aquiring kegg pathaway id...."
                 self.kegg_pathway_ids=list()
                 try:
                     response = urllib2.urlopen(url)
@@ -734,11 +757,19 @@ class PyMine(Tkinter.Tk):
                 if self.kegg_pathway_ids:
                     for i in self.kegg_pathway_ids:
                         url= 'http://rest.kegg.jp/get/'+i
-                        print "Aquiring Kegg Pathways...."
+                        #print "Aquiring Kegg Pathways...."
                         try:
                             response = urllib2.urlopen(url)
                             for line in response:
-                                self.text5.insert(Tkinter.INSERT, line +"\n\n")
+                                if line.startswith('CLASS'):
+                                    break
+                                self.text5.insert(Tkinter.INSERT, line +"\n")
+
+                            # For the pathway information hyperlink
+                            self.text5.insert(Tkinter.INSERT, url+"\n\n", ('link'))
+                            self.text5.tag_config('link', foreground="blue", underline=1)
+                            self.text5.tag_bind('link', '<Button-1>', lambda event, arg=url: self.showLink(event, arg))
+                            
                         except urllib2.HTTPError, err:
                             if err.code == 404:
                                 print "Page not found for kegg pathways!"
@@ -748,7 +779,7 @@ class PyMine(Tkinter.Tk):
                                 print "Something happened in Kegg pathways! Error code", err.code
                         ### Get pathway images
                         url= 'http://rest.kegg.jp/get/'+i+'/image'
-                        print "Aquiring pathaway images...."
+                        #print "Aquiring pathaway images...."
                         try:
                             imgRequest = urllib2.Request(url)
                             imgData=urllib2.urlopen(imgRequest).read()
@@ -762,6 +793,15 @@ class PyMine(Tkinter.Tk):
                             fh=open(filename+".gif", "w")
                             fh.write(imgData)
                             fh.close()
+                            path_image=self.pathwaydir+"/"+filename+".gif"
+                            #print path_image
+                            
+                            ButtonImage=Tkinter.PhotoImage(file=path_image)
+                            #print ButtonImage
+                            path_button=Tkinter.Button(self.text5, text="Pathway Image", command=lambda j=path_image: self.show_pathway(j))
+                            #path_button.img=ButtonImage
+                            self.text5.window_create(Tkinter.INSERT, window=path_button)
+                            self.text5.insert(Tkinter.INSERT, "\n----------------------------X--------------------------\n\n\n")
                         except urllib2.HTTPError, err:
                             if err.code == 404:
                                 print "Page not found for pathway images!"
@@ -775,7 +815,7 @@ class PyMine(Tkinter.Tk):
         else:
             print "Kegg gene not available"
             self.text5.insert(Tkinter.INSERT, "Kegg data not found.\n\n")
-        print os.getcwd()
+        #print os.getcwd()
     def get_results(self):
         self.text1.lift()
         self.text1.config(state=Tkinter.NORMAL)
@@ -791,36 +831,39 @@ class PyMine(Tkinter.Tk):
         self.text6.config(state=Tkinter.NORMAL)
         self.text6.delete(1.0, Tkinter.END)
 
+        #Get PDB and Uniprot information.
         self.get_info()
         
         self.text1.insert(Tkinter.INSERT, "PDB ID: "+self.pdb_id+ "\n\n")
-        
         if self.uniprot:
             self.text1.insert(Tkinter.END, "Uniprot: " +', '.join(map(str, self.uniprot))+"\n\n")        
         else:
             self.text1.insert(Tkinter.END, "Uniprot id not found " +"\n\n")
         self.show_pdb()
+        #Get Uniprot File
         self.get_pdb_uniprot_file()
-
+        #Get Ligands
         self.get_ligands()
-        
+
+
         if self.ligands:
             self.text2.insert(Tkinter.END, "Ligands in PDB: \n\n")
             for i in self.ligands:
                 self.text2.insert(Tkinter.END, ' '.join(map(str, i))+"\n\n")
         else:
             self.text2.insert(Tkinter.END, "Ligands not found\n\n")
+        
 
         self.get_ligand_images()
         self.get_target_chembl_id()
         self.get_approved_drugs()
         self.show_lig_info()        
-        self.get_saps()
+        self.get_saps()  
         
+
         if self.saps:
             self.show_saps()
             self.text1.insert(Tkinter.END, "Single Amino Acid Polymoprphism:\n\n"+  '\n'.join(map(str, self.saps))+"\n\n")
-        
         else:
             print "SAPs not found"
             self.text1.insert(Tkinter.END, "Single Amino Acid Polymoprphism not found"+"\n\n")
@@ -834,28 +877,25 @@ class PyMine(Tkinter.Tk):
             self.text1.insert(Tkinter.END, "Binding Sites/Similar Binding Sites: \n\n")
             for i in self.binding_sites:
                 for j in i:
-                    self.text1.insert(Tkinter.END, '\t'.join(map(str, j))+"\n\n")
-        
+                    self.text1.insert(Tkinter.END, '\t'.join(map(str, j))+"\n\n") 
         #Ligand Information
-         
         # ASSAY INFORMATION
-        
         if self.target_chemblID:
             self.get_assay_info()
             if self.ec50_comps:
-                print "EC50 data available"
+                #print "EC50 data available"
                 self.text2.insert(Tkinter.END, "Compounds with EC50 values <=100 nM:"+"\n\n")
                 self.text2.insert(Tkinter.END, ' '.join(map(str, self.ec50_comps))+"\n\n")
             else:
                 self.text2.insert(Tkinter.END, "EC50 data not available"+"\n\n")
             if self.ic50_comps:
-                print "IC50 data available"
+                #print "IC50 data available"
                 self.text2.insert(Tkinter.END, "Compounds with IC50 values <=100 nM:"+"\n\n")
                 self.text2.insert(Tkinter.END, ' '.join(map(str, self.ic50_comps))+"\n\n")
             else:
                 self.text2.insert(Tkinter.END, "IC50 data not avaialble"+"\n\n")
             if self.ki_comps:
-                print "KI data available"
+                #print "KI data available"
                 self.text2.insert(Tkinter.END, "Compounds with Ki values <=100 nM:"+"\n\n")
                 self.text2.insert(Tkinter.END, ' '.join(map(str, self.ki_comps))+"\n\n")
             else:
@@ -924,7 +964,6 @@ def main():
     app = PyMine(None)
     app.title('PyMine Data Integration')
     app.mainloop()
-
 
 if __name__ == "__main__":
         main()
