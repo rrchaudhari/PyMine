@@ -1,6 +1,6 @@
 """
 ------------
-PyMine 1.0.0
+PyMine 1.0.1
 ------------
 PyMine lets you integrate and visualize biological data used for drug discovery using PyMOL. 
 
@@ -9,7 +9,7 @@ REQUIREMENTS
 ------------
 1) Ubuntu 11.04 or above OR Mac OS X 10.7 or above
 2) Pymol 1.7 or above
-3) PyMine 1.0.0
+3) PyMine 1.0.1
 
 ------------
 INSTALLATION
@@ -546,9 +546,8 @@ class PyMine(Tkinter.Tk):
         #print "6 Aquiring target chembl id...."
         if self.uniprot:
             url="http://www.ebi.ac.uk/chemblws/targets/uniprot/"+str(self.uniprot[0])
-            print url
+            #print url
             try:
-                print "in try"
                 response_assay_xml=urllib2.urlopen(url).read()
                 root=ET.fromstring(response_assay_xml)
                 for i in root:
@@ -571,7 +570,7 @@ class PyMine(Tkinter.Tk):
             self.text2.insert(Tkinter.END, "Could not retrieve assay information because uniprot id missing\n\n")
 
         if self.target_chemblID:
-            print self.target_chemblID
+            #print self.target_chemblID
             self.get_assay_info()
             if self.ec50_comps:
                 #print "EC50 data available"
