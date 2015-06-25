@@ -789,7 +789,7 @@ class PyMine(Tkinter.Tk):
             response_xml_chemblids=urllib2.urlopen(url).read()
             root=ET.fromstring(response_xml_chemblids)
             for i in root:
-                if i[6].text=="EC50" and i[13].text=="=" and i[12].text!="Unspecified" and float(i[12].text)<=0.1 and i[9].text=="nM":
+                if i[6].text=="EC50" and i[13].text=="=" and i[12].text!="Unspecified" and float(i[12].text)<=10 and i[9].text=="nM":
                     self.ec50_comps.append(i[4].text)
                 elif i[6].text=="IC50" and i[13].text=="=" and i[12].text!="Unspecified" and float(i[12].text)<=10 and i[9].text=="nM":
                     self.ic50_comps.append(i[4].text)
