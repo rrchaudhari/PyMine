@@ -25,16 +25,31 @@ Using MacPyMOL
 2) Install XQuartz found at http://xquartz.macosforge.org/landing/
 3) Follow the installation procedure of plugin mentioned above. 
 
------
-USAGE
------
-1) Start PyMOL and go to PyMOL -> Plugins -> PyMine
-2) Type the PDB id and chain id of the interested target and click SUBMIT. 
-3) To find similar ligands, enter smile string into smile text box (control-v) and click on Find Similar Ligands button.
+-------
+History
+-------
+- v1.0.0: Initial public release
 
--------
-RESULTS
--------
-1) In PyMOL graphics viewer SAPs and Binding Sites data will be available for viewing.
-2) In PyMine GUI data will be available and accessed using relevant tabs/buttons.
-3) Output files will be saved in a desktop folder named "PyMine_Outdir_xxxx". 
+-------------
+Licence (MIT)
+-------------
+
+Copyright (c) 2015 Rajan Chaudhari and Zhijun Li
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.

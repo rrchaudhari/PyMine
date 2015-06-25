@@ -24,20 +24,6 @@ Using MacPyMOL
 2) install XQuartz found at http://xquartz.macosforge.org/landing/
 3) Follow the installatin procedure of plugin mentioned above. 
 
------
-USAGE
------
-1) Start PyMol and go to Plugins -> PyMine
-2) Type the PDB id and chain id of the interested target and click SUBMIT. 
-3) To find similar ligands, enter smile string into smile text box (control-v) and click on Find Similar Ligands button.
-
--------
-RESULTS
--------
-1) In PyMOL graphics viewer SAPs and Binding Sites data will be available for viewing.
-2) In PyMine GUI data will be available and accessed using relevant tabs/buttons.
-3) Output files will be saved in a desktop folder named "PyMine_outdir_xxxx". 
-
 -------
 History
 -------
