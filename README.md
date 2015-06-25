@@ -10,20 +10,20 @@ REQUIREMENTS
 ------------
 1) Ubuntu 11.04 or above OR Mac OS X 10.7 or above
 2) PyMOL 1.7 or above
-3) PyMine 1.0.0
+3) PyMine 1.0.1
 
 ------------
 INSTALLATION
 ------------
 1) Download and install PyMOL. http://sourceforge.net/projects/pymol/
-2) Download and unzip PyMine. 
+2) Download PyMine from https://github.com/rrchaudhari/PyMine and unzip using suitable tool. 
 3) Open PyMol. Install PyMine: PyMOL -> Plugins -> Manage Plugins -> Install -> (locate pymine.py file).
 4) Restart PyMOL
 
 Using MacPyMOL  
 1) Rename the "MacPyMOL.app" to "PyMOLX11Hybrid.app" in Applications folder.
 2) Install XQuartz found at http://xquartz.macosforge.org/landing/
-3) Follow the installatin procedure of plugin mentioned above. 
+3) Follow the installation procedure of plugin mentioned above. 
 
 -----
 USAGE
