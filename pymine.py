@@ -78,6 +78,7 @@ import pymol
 from Tkinter import PhotoImage as PI
 import xml.etree.ElementTree as ET
 import webbrowser
+import tkFileDialog
 
 #initialize pymol plugin
 def __init__(self):
@@ -93,6 +94,7 @@ class PyMine(Tkinter.Tk):
         self.createGUI()
         
         # GLOBAL VARIABLE ARE DEFINED HERE SO THAT THEY CAN BE USED IN ANY FUNCTION
+        self.flag=0
         self.pdb_id=''
         self.pdb_chain_id=''
         self.pdb_file=''
@@ -118,14 +120,18 @@ class PyMine(Tkinter.Tk):
         self.target_chemblID=''
         self.approved_drugs=list()
         self.ligand_images=list()
-        self.kegg_info='' 
+        self.kegg_info=''
+        self.userpdbfile=None
+        #self.label4.config(text=None)
+        self.entryVariable5.set(None)
+
     def createGUI(self):
         ## Create Frame
         self.frame1=Tkinter.Frame(self)
         self.frame1.grid(sticky='nswe')
 
         ## INPUT 
-        self.label1=Tkinter.Label(self.frame1, text="Enter PDB ID and Chain ID")   #LABEL
+        self.label1=Tkinter.Label(self.frame1, text="Enter PDB ID")   #LABEL
         self.label1.grid(row=1, column=0, sticky=Tkinter.W)
         
         self.entryVariable1=Tkinter.StringVar(master=self.frame1)  #INPUT Variable
@@ -134,36 +140,65 @@ class PyMine(Tkinter.Tk):
         self.entry1=Tkinter.Entry(self.frame1, textvariable=self.entryVariable1, width=4) #INPUT Box
         self.entry1.grid(row=1, column=1, sticky=Tkinter.W)
 
+        self.label1_1=Tkinter.Label(self.frame1, text="Enter Chain ID")   #LABEL
+        self.label1_1.grid(row=1, column=2, sticky=Tkinter.W)
+
         self.entryVariable2=Tkinter.StringVar(master=self.frame1) #Input Variable 2 
         self.entryVariable2.set('A')
         
         self.entry2=Tkinter.Entry(self.frame1, textvariable=self.entryVariable2, width=2) #input box 2
-        self.entry2.grid(row=1, column=2, sticky=Tkinter.W)
+        self.entry2.grid(row=1, column=3, sticky=Tkinter.W)
         
-        self.button1=Tkinter.Button(self.frame1, text="Submit", command=self.get_results) #Button1
-        self.button1.grid(row=1, column=3, sticky=Tkinter.W)
+        self.label2_2=Tkinter.Label(self.frame1, text="OR")   #LABEL
+        self.label2_2.grid(row=1, column=4, sticky=Tkinter.W)
+
+        #self.button1=Tkinter.Button(self.frame1, text="Submit", command=self.get_results) #Button1
+        #self.button1.grid(row=1, column=4, sticky=Tkinter.W)
         
         self.button2=Tkinter.Button(self.frame1, text="Clear", command=self.clear) #Button2
-        self.button2.grid(row=1, column=4, sticky=Tkinter.W)
+        self.button2.grid(row=4, column=4, sticky=Tkinter.W)
+
+        self.label3=Tkinter.Label(self.frame1, text="Select PDB File")   #LABEL
+        self.label3.grid(row=2, column=0, sticky=Tkinter.W)
+
+        self.button1_1=Tkinter.Button(self.frame1, text="Browse", command=self.file_upload) #Button2
+        self.button1_1.grid(row=2, column=1, sticky=Tkinter.W) 
+
+        self.label5=Tkinter.Label(self.frame1, text="Enter Uniprot ID")   #LABEL
+        self.label5.grid(row=2, column=2, sticky=Tkinter.W)
+
+        self.entryVariable5=Tkinter.StringVar(master=self.frame1) #Input Variable 3 
+        self.entryVariable5.set('')
+        
+        self.entry5=Tkinter.Entry(self.frame1, textvariable=self.entryVariable5, width=6) #input box 3
+        self.entry5.grid(row=2, column=3, sticky=Tkinter.W)
+
+
+        self.button2_2=Tkinter.Button(self.frame1, text="Submit", command=self.get_results) #Button1
+        self.button2_2.grid(row=2, column=4, sticky=Tkinter.W)
+
+        self.label4=Tkinter.Label(self.frame1, width=10, anchor=Tkinter.W, justify=Tkinter.LEFT)   #LABEL
+        self.label4.grid(row=3, column=1, sticky=Tkinter.W) 
+
 
         self.label2=Tkinter.Label(self.frame1, text="Enter Smile String")   #LABEL
-        self.label2.grid(row=2, column=0, sticky=Tkinter.W)
+        self.label2.grid(row=4, column=0, sticky=Tkinter.W)
 
         self.entryVariable3=Tkinter.StringVar(master=self.frame1) #Input Variable 3 
         self.entryVariable3.set('')
         
         self.entry3=Tkinter.Entry(self.frame1, textvariable=self.entryVariable3, width=10) #input box 3
-        self.entry3.grid(row=2, column=1, columnspan=2, sticky=Tkinter.W)
+        self.entry3.grid(row=4, column=1, columnspan=2, sticky=Tkinter.W)
         
         self.button3=Tkinter.Button(self.frame1, text="Find Similar Ligands", command=self.get_similar_ligands) #Button2
-        self.button3.grid(row=2, column=3, columnspan=2, sticky=Tkinter.W)
+        self.button3.grid(row=4, column=2, sticky=Tkinter.W)
         
         self.button11=Tkinter.Button(self.frame1, text="?", command=self.smiles_help)
-        self.button11.grid(row=2, column=5, sticky=Tkinter.W)
+        self.button11.grid(row=4, column=3, sticky=Tkinter.W)
 
         ## OUTPUT 
         self.rframe=Tkinter.LabelFrame(master=self.frame1, text="Data Panel")
-        self.rframe.grid(row=4, columnspan=6, sticky='nswe')
+        self.rframe.grid(row=6, columnspan=6, sticky='nswe')
 
         self.button5=Tkinter.Button(self.rframe, text="Protein", command=self.lift_prot_info)
         self.button5.grid(row=0, column=0)
@@ -189,9 +224,7 @@ class PyMine(Tkinter.Tk):
         scrollbar1=Tkinter.Scrollbar(self.rframe, command=self.text1.yview)
         scrollbar1.grid(row=5, column=11, sticky='nswe')
         self.text1.configure(yscrollcommand=scrollbar1.set)
-        
         self.text1.lower()
-
 
         self.text2=Tkinter.Text(master=self.rframe, wrap=Tkinter.WORD)
         self.text2.grid(row=5, column=0, columnspan=10, stick='ns')
@@ -272,9 +305,23 @@ class PyMine(Tkinter.Tk):
         self.text3.lower()
         self.text4.lower()
         self.text5.lower()
+    def file_upload(self):
+        toplevel1 = Tkinter.Toplevel()
+        toplevel1.withdraw()
+        
+        self.userpdbfile = tkFileDialog.askopenfile(parent=toplevel1,mode='rb',title='Choose a file')
+        self.userpdbfile_path=self.userpdbfile.name
+        print self.userpdbfile_path
+
+        self.userpdb_filename=os.path.basename(self.userpdbfile_path)
+        self.userpdb_filename_noext=self.userpdb_filename.split('.')[0]
+        if self.userpdbfile != None:
+            self.label4.config(text=self.userpdb_filename)
     def smiles_help(self):
+        #dnlkd
         tkMessageBox.showinfo(title = 'Smiles', message = "To find similar ligands, paste your smile string in the entry box and hit Find Similar Ligands button. \n On Mac use Command+C to copy from the Data Panel and use Control+V to paste in the entry box")
     def showLink(self, event, arg):
+        #fgdfg
         webbrowser.open_new(arg)
     def show_pathway(self, path):
         toplevel = Tkinter.Toplevel()
@@ -368,25 +415,57 @@ class PyMine(Tkinter.Tk):
             if len(line.split())>1:
                 if self.pdb_id == str(line.split()[0]):
                     self.uniprot.append(str(line.split()[5])[1:-1])
+        self.text1.insert(Tkinter.INSERT, "PDB ID: "+self.pdb_id+ "\n\n")
+        if self.uniprot:
+            self.text1.insert(Tkinter.END, "Uniprot: " +', '.join(map(str, self.uniprot))+"\n\n")        
+        else:
+            self.text1.insert(Tkinter.END, "Uniprot id not found " +"\n\n") 
+    def get_user_info(self):
+        #print "1 Aquiring uniprot id from pdb id...."
+        self.pdb_id=self.userpdb_filename_noext
+        print self.pdb_id
+        #self.pdb_chain_id=self.entryVariable2.get().upper()
+        cwd = os.path.expanduser("~/Desktop/")
+        self.outdir = os.path.join(cwd, 'PyMine_Output_'+str(self.pdb_id))
+        if not os.path.exists(self.outdir):
+            os.mkdir(self.outdir)
+            os.chdir(self.outdir)
+        self.uniprot.append(self.entryVariable5.get().upper())
+        self.text1.insert(Tkinter.INSERT, "PDB File: "+self.pdb_id+ "\n\n")
+        if self.uniprot:
+            self.text1.insert(Tkinter.END, "Uniprot: " +', '.join(map(str, self.uniprot))+"\n\n")        
+        else:
+            self.text1.insert(Tkinter.END, "Uniprot id not found " +"\n\n")
     def show_pdb(self):
         #print "2 Importing 3d structure...."
         pymol.cmd.cd(self.outdir)
         #print pymol.cmd.pwd()
         current_pdb=self.pdb_id
         #pymol.finish_launching()
-        pymol.cmd.fetch(current_pdb) #pymol.cmd.load("/Users/rrc/Desktop/pymol_plugin/2RH1.pdb",current_pdb)
+        if self.flag==1:
+            pymol.cmd.load(self.userpdbfile_path)
+        else:
+            pymol.cmd.fetch(current_pdb) #pymol.cmd.load("/Users/rrc/Desktop/pymol_plugin/2RH1.pdb",current_pdb)  
+
         pdbfilename=str(self.pdb_id)+".pdb"
         #pymol.cmd.save(pdbfilename, current_pdb)
         pymol.cmd.hide('everything', current_pdb)
         #pymol.cmd.select("selection", current_pdb)
         pymol.cmd.show('cartoon')
         pymol.cmd.select('ligand', 'organic')
-    def get_pdb_uniprot_file(self):
+    def get_pdb_file(self):
         #print "3 Aquiring pdb and uniprot file...."
-        filename=str(self.pdb_id.lower())+".pdb"
-        pdbfile=open(filename, "r")
-        for line in pdbfile:
-            self.text3.insert(Tkinter.END, line)
+        if self.flag==1:
+            pdbfile=open(self.userpdbfile_path, "r")
+            for line in pdbfile:
+                self.text3.insert(Tkinter.END, line)
+        else:
+            filename=str(self.pdb_id.lower())+".pdb"
+            pdbfile=open(filename, "r")
+            for line in pdbfile:
+                self.text3.insert(Tkinter.END, line)
+    def get_uniprot_file(self):
+        #print self.uniprot[0]
         if self.uniprot:
             fh=open(self.uniprot[0]+".txt", "w")
             for line in urllib2.urlopen('http://www.uniprot.org/uniprot/'+self.uniprot[0]+'.txt'):
@@ -416,6 +495,13 @@ class PyMine(Tkinter.Tk):
                 print "Access denied for pdb ligands!"
             else:
                 print "Something else happened in pdb ligands! Error code", err.code
+        
+        if self.ligands:
+            self.text2.insert(Tkinter.END, "Ligands in PDB: \n\n")
+            for i in self.ligands:
+                self.text2.insert(Tkinter.END, ' '.join(map(str, i))+"\n\n")
+        else:
+            self.text2.insert(Tkinter.END, "Ligands not found\n\n")
     def get_ligand_images(self):
         #print "5 Aquiring pdb ligand images...."
         self.ligdir=os.path.join(self.outdir, "Ligands")
@@ -460,10 +546,13 @@ class PyMine(Tkinter.Tk):
         #print "6 Aquiring target chembl id...."
         if self.uniprot:
             url="http://www.ebi.ac.uk/chemblws/targets/uniprot/"+str(self.uniprot[0])
+            print url
             try:
+                print "in try"
                 response_assay_xml=urllib2.urlopen(url).read()
                 root=ET.fromstring(response_assay_xml)
                 for i in root:
+                    #print i.tag
                     if i.tag =="preferredName":
                         self.common_name=str(i.text)
                     if i.tag =="organism":
@@ -480,6 +569,30 @@ class PyMine(Tkinter.Tk):
         else:
             print "Error in uniprot id!"
             self.text2.insert(Tkinter.END, "Could not retrieve assay information because uniprot id missing\n\n")
+
+        if self.target_chemblID:
+            print self.target_chemblID
+            self.get_assay_info()
+            if self.ec50_comps:
+                #print "EC50 data available"
+                self.text2.insert(Tkinter.END, "Compounds with EC50 values <=100 nM:"+"\n\n")
+                self.text2.insert(Tkinter.END, ' '.join(map(str, self.ec50_comps))+"\n\n")
+            else:
+                self.text2.insert(Tkinter.END, "EC50 data not available"+"\n\n")
+            if self.ic50_comps:
+                #print "IC50 data available"
+                self.text2.insert(Tkinter.END, "Compounds with IC50 values <=100 nM:"+"\n\n")
+                self.text2.insert(Tkinter.END, ' '.join(map(str, self.ic50_comps))+"\n\n")
+            else:
+                self.text2.insert(Tkinter.END, "IC50 data not avaialble"+"\n\n")
+            if self.ki_comps:
+                #print "KI data available"
+                self.text2.insert(Tkinter.END, "Compounds with Ki values <=100 nM:"+"\n\n")
+                self.text2.insert(Tkinter.END, ' '.join(map(str, self.ki_comps))+"\n\n")
+            else:
+                self.text2.insert(Tkinter.END, "Ki data not available"+"\n\n")
+        else:
+            self.text2.insert(Tkinter.END, "Assay data not available"+"\n\n")
     def get_approved_drugs(self):
         #print "7 Aquiring approved drugs...."
         try:
@@ -556,6 +669,12 @@ class PyMine(Tkinter.Tk):
                     disease=line.split()[6:]
                     self.saps.append([origres, num, changedres, disease])
                     #print gene_name, mutation, origres, num, changedres
+        if self.saps:
+            self.show_saps()
+            self.text1.insert(Tkinter.END, "Single Amino Acid Polymoprphism:\n\n"+  '\n'.join(map(str, self.saps))+"\n\n")
+        else:
+            print "SAPs not found"
+            self.text1.insert(Tkinter.END, "Single Amino Acid Polymoprphism not found"+"\n\n")
     def show_saps(self):
         #print "10 Showing SAPS...."
         sap_residues=list()
@@ -651,9 +770,21 @@ class PyMine(Tkinter.Tk):
             pymol.cmd.select("pep_bs"+str(counter), self.pep_bs_residues)    #pymol.cmd.create() would create objects instead of selection for coloring
             pymol.cmd.deselect()
         pymol.cmd.group("PEP_Binding_Sites", "pep_bs*")
+
+        if len(self.binding_sites[0])==0 and len(self.binding_sites[1])==0 and len(self.binding_sites[2])==0 and len(self.binding_sites[3])==0 and len(self.binding_sites[4])==0 and len(self.binding_sites[5])==0:
+            self.text1.insert(Tkinter.END, "Binding site data not found\n")
+        else:
+            self.text1.insert(Tkinter.END, "Binding Sites/Similar Binding Sites: \n\n")
+            for i in self.binding_sites:
+                for j in i:
+                    self.text1.insert(Tkinter.END, '\t'.join(map(str, j))+"\n\n")
     def get_assay_info(self):
         #print "13 Aquiring assay information...."
-        os.chdir(self.ligdir)
+        self.ligdir=os.path.join(self.outdir, "Ligands")
+        if not os.path.exists(self.ligdir):
+            os.mkdir(self.ligdir)
+            os.chdir(self.ligdir)
+        #os.chdir(self.ligdir)
         url="http://www.ebi.ac.uk/chemblws/targets/"+self.target_chemblID+"/bioactivities"  
         try:
             response_xml_chemblids=urllib2.urlopen(url).read()
@@ -831,80 +962,33 @@ class PyMine(Tkinter.Tk):
         self.text6.config(state=Tkinter.NORMAL)
         self.text6.delete(1.0, Tkinter.END)
 
-        #Get PDB and Uniprot information.
-        self.get_info()
-        
-        self.text1.insert(Tkinter.INSERT, "PDB ID: "+self.pdb_id+ "\n\n")
-        if self.uniprot:
-            self.text1.insert(Tkinter.END, "Uniprot: " +', '.join(map(str, self.uniprot))+"\n\n")        
+        if self.userpdbfile!=None and self.entryVariable5.get()!=None:
+            self.flag=1
+            self.get_user_info()
+            self.show_pdb()
+            self.get_pdb_file()
+            self.get_uniprot_file()
+            self.get_target_chembl_id()
+            self.get_approved_drugs()
+            self.show_lig_info()        
+            self.get_saps()     
+            #self.get_bs()
+            #self.show_bs()
+            self.get_kegg_info()
         else:
-            self.text1.insert(Tkinter.END, "Uniprot id not found " +"\n\n")
-        self.show_pdb()
-        #Get Uniprot File
-        self.get_pdb_uniprot_file()
-        #Get Ligands
-        self.get_ligands()
-
-
-        if self.ligands:
-            self.text2.insert(Tkinter.END, "Ligands in PDB: \n\n")
-            for i in self.ligands:
-                self.text2.insert(Tkinter.END, ' '.join(map(str, i))+"\n\n")
-        else:
-            self.text2.insert(Tkinter.END, "Ligands not found\n\n")
-        
-
-        self.get_ligand_images()
-        self.get_target_chembl_id()
-        self.get_approved_drugs()
-        self.show_lig_info()        
-        self.get_saps()  
-        
-
-        if self.saps:
-            self.show_saps()
-            self.text1.insert(Tkinter.END, "Single Amino Acid Polymoprphism:\n\n"+  '\n'.join(map(str, self.saps))+"\n\n")
-        else:
-            print "SAPs not found"
-            self.text1.insert(Tkinter.END, "Single Amino Acid Polymoprphism not found"+"\n\n")
-        
-        self.get_bs()
-        self.show_bs()
-        #Binding Site
-        if len(self.binding_sites[0])==0 and len(self.binding_sites[1])==0 and len(self.binding_sites[2])==0 and len(self.binding_sites[3])==0 and len(self.binding_sites[4])==0 and len(self.binding_sites[5])==0:
-            self.text1.insert(Tkinter.END, "Binding site data not found\n")
-        else:
-            self.text1.insert(Tkinter.END, "Binding Sites/Similar Binding Sites: \n\n")
-            for i in self.binding_sites:
-                for j in i:
-                    self.text1.insert(Tkinter.END, '\t'.join(map(str, j))+"\n\n") 
-        #Ligand Information
-        # ASSAY INFORMATION
-        if self.target_chemblID:
-            self.get_assay_info()
-            if self.ec50_comps:
-                #print "EC50 data available"
-                self.text2.insert(Tkinter.END, "Compounds with EC50 values <=100 nM:"+"\n\n")
-                self.text2.insert(Tkinter.END, ' '.join(map(str, self.ec50_comps))+"\n\n")
-            else:
-                self.text2.insert(Tkinter.END, "EC50 data not available"+"\n\n")
-            if self.ic50_comps:
-                #print "IC50 data available"
-                self.text2.insert(Tkinter.END, "Compounds with IC50 values <=100 nM:"+"\n\n")
-                self.text2.insert(Tkinter.END, ' '.join(map(str, self.ic50_comps))+"\n\n")
-            else:
-                self.text2.insert(Tkinter.END, "IC50 data not avaialble"+"\n\n")
-            if self.ki_comps:
-                #print "KI data available"
-                self.text2.insert(Tkinter.END, "Compounds with Ki values <=100 nM:"+"\n\n")
-                self.text2.insert(Tkinter.END, ' '.join(map(str, self.ki_comps))+"\n\n")
-            else:
-                self.text2.insert(Tkinter.END, "Ki data not available"+"\n\n")
-        else:
-            self.text2.insert(Tkinter.END, "Assay data not available"+"\n\n")
-
-        # PATHWAY INFORMATION
-        self.get_kegg_info()
+            self.get_info()
+            self.show_pdb()
+            self.get_pdb_file()
+            self.get_uniprot_file()
+            self.get_ligands()
+            self.get_ligand_images()
+            self.get_target_chembl_id()
+            self.get_approved_drugs()
+            self.show_lig_info()        
+            self.get_saps()     
+            self.get_bs()
+            self.show_bs()
+            self.get_kegg_info()
 
         self.text1.config(state=Tkinter.DISABLED)
         self.text2.config(state=Tkinter.DISABLED)
@@ -927,12 +1011,20 @@ class PyMine(Tkinter.Tk):
         self.text6.config(state=Tkinter.NORMAL)
         self.text6.delete(1.0, Tkinter.END)
 
+        
+        self.flag=0
         self.pdb_id=''
         self.pdb_chain_id=''
         self.entryVariable1.set('')
         self.entryVariable2.set('')
         self.entryVariable3.set('')
-        cwd = os.path.expanduser("~/Desktop/")
+        self.entryVariable5.set(None)
+        self.userpdbfile=None
+        self.userpdbfile_path=''
+        self.userpdb_filename=''
+        self.userpdb_filename_noext=''
+        self.label4.config(text='')
+        cwd=os.path.expanduser("~/Desktop/")
         self.pdb_file=''
         self.smiles=''
         self.name=list()
@@ -958,12 +1050,12 @@ class PyMine(Tkinter.Tk):
         self.ic50_comps=list()
         self.outdir=None
         pdbfile=None
-        pymol.cmd.delete("all")
+        pymol.cmd.delete('all')
+        pymol.cmd.reinitialize()
         self.text1.lift()
 def main():
     app = PyMine(None)
     app.title('PyMine Data Integration')
     app.mainloop()
-
 if __name__ == "__main__":
         main()
