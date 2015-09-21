@@ -682,7 +682,7 @@ class PyMine(Tkinter.Tk):
         ion_bs=list()
         pep_bs=list()    
         try:
-            for line in urllib2.urlopen("https://dl.dropboxusercontent.com/u/4882263/ibisdown/"+self.pdb_id[1:-1]+"/"+self.pdb_id+".txt"):
+            for line in urllib2.urlopen("https://dl.dropboxusercontent.com/u/61033253/ibisdown/"+self.pdb_id[1:-1]+"/"+self.pdb_id+".txt"):
                 spline=line.split(":") #Query:Interaction_type:Mmdb_Residue_No:PDB_Residue_No:Binding_Site_Residues:Binding_Site_Conservation:Avg_PercentID:Singleton:PISA_validation:Biol_Chemical_validation:Site_CDD_Annotation:Interaction_Partner:PDB_Evidence:Is_Observed:Ranking_Score:Query_Domain
                 if spline[1]=="LIG" and spline[0][-1:]==self.pdb_chain_id:
                     lig_bs.append([spline[1], spline[0], spline[3], spline[11], spline[12]])
