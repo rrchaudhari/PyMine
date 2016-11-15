@@ -54,6 +54,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 """
+
+
+"""
+Things to do:
+"""
+
+
 import os
 import sys
 import fileinput
@@ -111,6 +118,9 @@ class PyMine(Tkinter.Tk):
         #self.label4.config(text=None)
         self.entryVariable5.set(None)
 
+    """
+    hide methods that are not required for API
+    """
     def createGUI(self):
         ## Create Frame
         self.frame1=Tkinter.Frame(self)
