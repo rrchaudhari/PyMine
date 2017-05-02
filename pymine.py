@@ -58,6 +58,7 @@ THE SOFTWARE.
 
 """
 Things to do:
+change the format from pdb to cif 
 """
 
 
